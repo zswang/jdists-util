@@ -24,16 +24,23 @@ export {
 }
 
 /**
+ * 属性集合
+ */
+export interface IAttrs {
+  [name: string]: string
+}
+
+/**
  * 代码块处理器
  *
  * @param content 代码块内容
- * @param attributes= 该节点属性
+ * @param attrs= 该节点属性
  * @param scope= 该节点作用域
  * @param node= 节点
  * @return 返回处理后的字符串或者处理过程
  */
 export interface IProcessor {
-  (content: string, attributes?: ast.Attributes, scope?: IScope, node?: ast.Node): string | Promise<string>
+  (content: string, attrs?: IAttrs, scope?: IScope, node?: ast.Node): string | Promise<string>
 }
 
 /**
