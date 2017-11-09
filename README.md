@@ -5,6 +5,8 @@ jdists-util
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coverage-image]][coverage-url]
 
+@see [jdists](https://github.com/zswang/jdists)
+
 ## License
 
 MIT © [zswang](http://weibo.com/zswang)
