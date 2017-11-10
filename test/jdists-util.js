@@ -38,5 +38,39 @@ describe("src/jdists-util.ts", function () {
   assert.equal(examplejs_printLines.join("\n"), "false"); examplejs_printLines = [];
   });
           
+  it("buildProcessor():module.exports", function () {
+    examplejs_printLines = [];
+  var processor = jdistsUtil.buildProcessor(`
+    const path = require('path')
+    module.exports = function (content) {
+      return path.join('root', content.replace(/\\d/g, '#'))
+    }
+  `)
+  examplejs_print(processor('abc123def456'))
+  assert.equal(examplejs_printLines.join("\n"), "root/abc###def###"); examplejs_printLines = [];
+  });
+          
+  it("buildProcessor():content", function () {
+    examplejs_printLines = [];
+  var processor = jdistsUtil.buildProcessor(`
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  `)
+  examplejs_print(processor('abc123def456'))
+  assert.equal(examplejs_printLines.join("\n"), "root/abc###def###"); examplejs_printLines = [];
+  });
+          
+  it("buildProcessor():function", function () {
+    examplejs_printLines = [];
+  var processor = jdistsUtil.buildProcessor(`
+  function (content) {
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  }
+  `)
+  examplejs_print(processor('abc123def456'))
+  assert.equal(examplejs_printLines.join("\n"), "root/abc###def###"); examplejs_printLines = [];
+  });
+          
 });
          

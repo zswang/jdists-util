@@ -4,7 +4,7 @@
  * Utilities for jdists processors
  * @author
  *   zswang (http://weibo.com/zswang)
- * @version 0.0.8
+ * @version 0.0.14
  * @date 2017-11-10
  */
 import * as ast from 'cbml-ast'
@@ -162,4 +162,58 @@ export function isYes(text: string): boolean {
  */
 export function isNo(text: string): boolean {
   return /^(false|off|no)$/i.test(text)
+}
+/**
+ * 通过代码获取处理器
+ *
+ * @param body 处理器代码
+ * @return 返回处理器函数
+ * @example buildProcessor():module.exports
+  ```js
+  var processor = jdistsUtil.buildProcessor(`
+    const path = require('path')
+    module.exports = function (content) {
+      return path.join('root', content.replace(/\\d/g, '#'))
+    }
+  `)
+  console.log(processor('abc123def456'))
+  // > root/abc###def###
+  ```
+ * @example buildProcessor():content
+  ```js
+  var processor = jdistsUtil.buildProcessor(`
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  `)
+  console.log(processor('abc123def456'))
+  // > root/abc###def###
+  ```
+ * @example buildProcessor():function
+  ```js
+  var processor = jdistsUtil.buildProcessor(`
+  function (content) {
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  }
+  `)
+  console.log(processor('abc123def456'))
+  // > root/abc###def###
+  ```
+ */
+export function buildProcessor(body: string): IProcessor {
+  if (/\bmodule\.exports\s*=/.test(body)) { // module 模式
+    let module = {
+      exports: {}
+    }
+    new Function('require', 'module', 'exports', body)(
+      require, module, module.exports
+    )
+    return module.exports as IProcessor
+  }
+  // 兼容
+  if (!(/\bfunction\b/.test(body)) && /\bcontent\b/.test(body)) {
+    body = `function (content) { ${body} }`
+  }
+  // 纯函数
+  return new Function('require', `return (${body})`)(require) as IProcessor
 }
