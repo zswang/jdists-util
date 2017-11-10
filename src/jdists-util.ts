@@ -126,6 +126,24 @@ export interface IScope {
   setVariant: {
     (name: string, value: any)
   }
+
+  /**
+   * 获取当前文件所在目录
+   *
+   * @return 返回当前文件所在目录
+   */
+  getDirname: {
+    (): string
+  }
+
+  /**
+   * 获取当前文件名，相对工作目录
+   *
+   * @return 返回当前文件所在目录
+   */
+  getFilename: {
+    (): string
+  }
 }
 
 /**

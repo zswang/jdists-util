@@ -4,8 +4,8 @@
  * Utilities for jdists processors
  * @author
  *   zswang (http://weibo.com/zswang)
- * @version 0.0.7
- * @date 2017-11-09
+ * @version 0.0.8
+ * @date 2017-11-10
  */
 import * as ast from 'cbml-ast';
 export { ast };
@@ -101,6 +101,22 @@ export interface IScope {
      */
     setVariant: {
         (name: string, value: any);
+    };
+    /**
+     * 获取当前文件所在目录
+     *
+     * @return 返回当前文件所在目录
+     */
+    getDirname: {
+        (): string;
+    };
+    /**
+     * 获取当前文件名，相对工作目录
+     *
+     * @return 返回当前文件所在目录
+     */
+    getFilename: {
+        (): string;
     };
 }
 /**
