@@ -4,8 +4,8 @@
  * Utilities for jdists processors
  * @author
  *   zswang (http://weibo.com/zswang)
- * @version 0.0.14
- * @date 2017-11-10
+ * @version 0.1.0
+ * @date 2017-11-11
  */
 import * as ast from 'cbml-ast'
 export {
@@ -28,6 +28,14 @@ export interface IAttrs {
  */
 export interface IProcessor {
   (content: string, attrs?: IAttrs, scope?: IScope, node?: ast.Node): string | Promise<string>
+}
+/**
+ * 功能扩展
+ *
+ * @param target 扩展对象
+ */
+export interface IExtender {
+  (target: object)
 }
 /**
  * jdists 作用域
@@ -164,6 +172,83 @@ export function isNo(text: string): boolean {
   return /^(false|off|no)$/i.test(text)
 }
 /**
+ * 通过代码获取函数
+ *
+ * @param body 函数代码
+ * @return 返回函数
+ * @example buildFunction():module.exports
+  ```js
+  var fn = jdistsUtil.buildFunction(`
+    const path = require('path')
+    module.exports = function (content) {
+      return path.join('root', content.replace(/\\d/g, '#'))
+    }
+  `)
+  console.log(fn('abc123def456'))
+  // > root/abc###def###
+  ```
+ * @example buildFunction():params is "content"
+  ```js
+  var fn = jdistsUtil.buildFunction(`
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  `, `content`)
+  console.log(fn('abc123def456'))
+  // > root/abc###def###
+  ```
+ * @example buildFunction():params is undefined
+  ```js
+  var fn = jdistsUtil.buildFunction(`
+    const path = require('path')
+    return path.join('root', 'abc')
+  `)
+  console.log(fn())
+  // > root/abc
+  ```
+ * @example buildFunction():body is function
+  ```js
+  var fn = jdistsUtil.buildFunction(function (item) {
+    const path = require('path')
+    return path.join('root', item)
+  })
+  console.log(fn('abc'))
+  // > root/abc
+  ```
+ * @example buildFunction():function
+  ```js
+  var fn = jdistsUtil.buildFunction(`
+  function (content) {
+    const path = require('path')
+    return path.join('root', content.replace(/\\d/g, '#'))
+  }
+  `)
+  console.log(fn('abc123def456'))
+  // > root/abc###def###
+  ```
+ */
+export function buildFunction(body: string | Function, defaultParams?: string): Function {
+  if (typeof body === 'function') {
+    return body
+  }
+  if (/\bmodule\.exports\s*=/.test(body)) { // module 模式
+    let module = {
+      exports: {}
+    }
+    new Function('require', 'module', 'exports', body)(
+      require, module, module.exports
+    )
+    return module.exports as IProcessor
+  }
+  // 兼容
+  if (!(/\bfunction\b/.test(body))) {
+    body = `function (${defaultParams || ''}) {
+      ${body}
+    }`
+  }
+  // 纯函数
+  return new Function('require', `return (${body})`)(require) as IProcessor
+}
+/**
  * 通过代码获取处理器
  *
  * @param body 处理器代码
@@ -200,20 +285,6 @@ export function isNo(text: string): boolean {
   // > root/abc###def###
   ```
  */
-export function buildProcessor(body: string): IProcessor {
-  if (/\bmodule\.exports\s*=/.test(body)) { // module 模式
-    let module = {
-      exports: {}
-    }
-    new Function('require', 'module', 'exports', body)(
-      require, module, module.exports
-    )
-    return module.exports as IProcessor
-  }
-  // 兼容
-  if (!(/\bfunction\b/.test(body)) && /\bcontent\b/.test(body)) {
-    body = `function (content) { ${body} }`
-  }
-  // 纯函数
-  return new Function('require', `return (${body})`)(require) as IProcessor
+export function buildProcessor(body: string | Function): IProcessor {
+  return buildFunction(body, 'content, attrs, scope, node') as IProcessor
 }
