@@ -1,6 +1,6 @@
 {
   "name": "jdists-util",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Utilities for jdists processors",
   "main": "lib/jdists-util",
   "typings": "lib/jdists-util.d.ts",

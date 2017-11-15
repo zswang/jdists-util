@@ -4,8 +4,8 @@
  * Utilities for jdists processors
  * @author
  *   zswang (http://weibo.com/zswang)
- * @version 0.1.0
- * @date 2017-11-11
+ * @version 0.1.1
+ * @date 2017-11-15
  */
 import * as ast from 'cbml-ast';
 export { ast };
@@ -125,6 +125,15 @@ export interface IScope {
      */
     getFilename: {
         (): string;
+    };
+    /**
+     * 根据搜索表达式查询节点
+     *
+     * @param selector 搜索表达式 "tagName[attrName=attrValue]\*"，如果表达式最后一个字符是 '*' 则返回数组
+     * @return 返回第一个匹配的节点
+     */
+    querySelector: {
+        (selector: string): ast.Node | ast.Node[];
     };
 }
 /**
