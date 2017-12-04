@@ -61,10 +61,11 @@ export interface IScope {
    * 执行数据导入
    *
    * @param importation 导入项表达式 : "#variant" 内存, "@argv" 属性, "filename[?selector]" 文件和代码块
+   * @param isYaml 进行 YAML 解析
    * @return 返回导入的内容
    */
   execImport: {
-    (importation: string): string
+    (importation: string, isYaml?: boolean): string | object
   }
 
   /**
@@ -162,6 +163,25 @@ export interface IScope {
    */
   querySelector: {
     (selector: string): ast.Node | ast.Node[]
+  }
+  /**
+   * 获取一个文件的作用域
+   *
+   * @param filename 对应文件名
+   * @return 返回文件对应的作用域
+   */
+  fileScope: {
+    (filename: string): IScope
+  }
+  /**
+   * 获取内容的作用域
+   *
+   * @param content 内容
+   * @param filename 对应文件名
+   * @return 返回内容对应的作用域
+   */
+  contentScope: {
+    (content: string, filename?: string): IScope
   }
 }
 
